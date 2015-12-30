@@ -1,0 +1,107 @@
+<html>
+<head>
+<meta charset="UTF-8">
+ <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script type="text/javascript" src= "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script type="text/javascript" src= "javascript/ui-bootstrap-tpls-0.14.3.js"></script>
+<script type="text/javascript" src= "javascript/algebra.min.js"></script>
+ <!-- style type="text/css">
+ .boxsizingBorder {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}</style-->
+<!-- meta name="viewport" content="width=device-width, initial-scale=1"></meta-->
+</head>
+<body>
+<div ng-app="contact" ng-controller="sendController" >
+<div class="row"><div class="col-md-12">&nbsp</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-11"><legend>You can also say some thing to me.</legend>
+</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-3"><label>Your email</label></div>
+   <div class="col-md-8"><input ng-model="email" required></input>
+</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-3"><label>Subject</label></div>
+   <div class="col-md-8"><input ng-model="subject" required></input>
+</div></div>
+<div class="row"><div class="col-md-12">&nbsp</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-3"><label>Message&nbsp&nbsp&nbsp</label></div>
+   <div class="col-md-8"><textarea ng-model="body" rows="8" cols="60" required></textarea>
+</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-11"><label>{{solvemsg}}<br/>{{equation}}</label>
+</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-3"><input ng-model="validate" required></input></div>
+   <div class="col-md-8">
+</div></div>
+<div class="row">
+   <div class="col-md-1"></div>
+   <div class="col-md-11"><button ng-click="sendMessage()" class="btn btn-primary">Send</button>
+</div></div>
+</div>
+<script>
+function genEquation() {
+//    var expr0 = new Expression('x');
+    var coa = Math.floor(3 + Math.random() * 5);
+    var coc = Math.floor(Math.random() * 20) + ( coa * Math.floor(2 + Math.random() * 5));
+    var cob = ( coc - coa ) * Math.floor(1 + Math.random() * 10);
+//    expr0 = expr0.multiply(coa);
+//    expr0 = expr0.add(cob);
+//    var eq = new Equation(expr0, coc);
+    var eq = coa.toString() + ' * x + ' + cob.toString() + ' = ' + coc.toString() + ' * x';
+    return eq.toString();
+}
+var app = angular.module('contact', []);
+app.controller('sendController', ['$scope', '$log', '$http', function($scope, $log, $http) {
+        $scope.equation = genEquation();
+        $scope.solvemsg = 'Solve the equation to help me prevent bot. E.g, 2 * X + 4 = 4 * x, you input 2 below.';
+        $scope.messageData = {};
+        $scope.$log = $log;
+        $scope.sendMessage = function() {
+                var eq = algebra.parse($scope.equation);
+                var answer = eq.solveFor('x');
+                if (answer == $scope.validate) {
+                        $scope.solvemsg = 'Sending...';
+                        $scope.messageData = {email:$scope.email, subject:$scope.subject, body:$scope.body};
+//                      $log.log("in sendMessage already. JSON data with $scope.messageData: " + JSON.stringify($scope.messageData));
+                        $http({
+                            method : 'POST',
+                            url    : 'postMessage',
+                            data   : $scope.messageData,
+                            headers : {
+//                      'Content-Type' : 'application/x-www-form-urlencoded'
+//                    'Content-Type' : 'application/json; text/plain'
+                        'Content-Type' : 'application/json'
+                    }
+                        })
+                        .then(function successCallback(response) {
+                                if (response.data.indexOf('wrong') > -1 ) {
+                                        $scope.validate = '';
+                                        $scope.solvemsg = 'Failed to send message. Try again. You may want to send me direct email dj at dongjindu dot com';
+                                } else {
+                                    $scope.validate = '';
+                                    $scope.solvemsg = 'Sent.  less than 2 days if I reply.' + response.data;
+                                }
+                        }, function errorCallback(responseErr) {
+                                $scope.validate = '';
+                                $scope.solvemsg = 'Failed to send message. Try again.' + responseErr.data;
+                        });
+        } else {
+                        $scope.equation = genEquation();
+                        $scope.validate = '';
+                        $scope.solvemsg = 'Wrong. Try another equation:';
+                }
+        }
+}]);
+</script>
