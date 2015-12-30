@@ -1,4 +1,4 @@
-package com.dongjindu.contactpage
+package com.dongjindu.messageboard
 
 import spray.json._;
 
