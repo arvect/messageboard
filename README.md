@@ -1,13 +1,13 @@
 # messageboard
-An example of messageboard application by Scala and AngularJS
+An example of messageboard application by Scala and AngularJS  
 
-Scala ActorSystem bind itself to port 8080 which can be run any computer. It is better that the firewal turns off the incoming and outgoing tcp traffics except the one of webserver. The webserver usually is Apache or nginx and proxy the http post to the host where Scala ActorSystem runs. The web page containing AngularJS is placed in the directory of webserver by design. 
+Scala ActorSystem bind itself to port 8080 which can be run any computer. It is better that the firewal turns off the incoming and outgoing tcp traffics except the one of webserver. The webserver usually is Apache or nginx and proxy the http post to the host where Scala ActorSystem runs. The web page containing AngularJS is placed in the directory of webserver by design.  
 
-<h3>To install,</h3>
-cd baseDirectory of the project
-sbt clean package
+##To install
+cd baseDirectory of the project  
+sbt clean package  
 
-<h3>To run in linux, stay in baseDirectory,</h3>
-nohup java -jar target/scala-2.11/hello-assembly-0.1.0.jar &
-
+##To run in linux, stay in baseDirectory
+nohup java -jar target/scala-2.11/hello-assembly-0.1.0.jar &  
+  
 The file nohup.out will have the log of running program. It is possible to install the compiled binary as service. Then the init.d/*.sh has to be prepared. Some other SBT plugin maybe helpful for such intention.
